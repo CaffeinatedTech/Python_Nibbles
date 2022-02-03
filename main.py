@@ -30,8 +30,10 @@ class Level:
         self.tm = 0
         self.u = 0
         self.v = 0
-        self.w = 24
-        self.h = 16
+        self.w = 24 * 8
+        self.h = 16 * 8
+        self.wall_tile_x = 3
+        self.wall_tile_y = 0
 
     def draw(self):
         pyxel.bltm(0, 0, self.tm, self.u, self.v, self.w, self.h)
@@ -157,7 +159,7 @@ class Hud:
 
 class App:
     def __init__(self):
-        pyxel.init(192, 128, scale=8, caption="NIBBLES", fps=60)
+        pyxel.init(192, 128, title="NIBBLES", fps=60)
         pyxel.load("assets/resources.pyxres")
         self.current_game_state = GameState.RUNNING
         self.level = Level()
@@ -256,7 +258,8 @@ class App:
                 pyxel.play(3, 1)  # Play sound track 1 on channel 3 - Crash sound
                 self.current_game_state = GameState.GAME_OVER
         # Wall
-        if pyxel.tilemap(0).get(self.snake[0].x / 8, self.snake[0].y / 8) == 3:
+        if pyxel.tilemap(0).pget(self.snake[0].x / 8, self.snake[0].y / 8) == \
+                (self.level.wall_tile_x, self.level.wall_tile_y):
             pyxel.stop()
             pyxel.play(3, 1)  # Play sound track 1 on channel 3 - Crash sound
             self.current_game_state = GameState.GAME_OVER
@@ -317,7 +320,7 @@ class App:
 
     def check_input(self):
         if self.current_game_state == GameState.GAME_OVER:
-            if pyxel.btn(pyxel.KEY_ENTER):
+            if pyxel.btnp(pyxel.KEY_RETURN):
                 self.start_new_game()
         if pyxel.btnp(pyxel.KEY_M):
             self.toggle_music()
